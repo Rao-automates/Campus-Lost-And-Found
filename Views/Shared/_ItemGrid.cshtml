@@ -1,0 +1,47 @@
+@model IEnumerable<WEBDEV_Project.Models.Item>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5 text-muted bg-white rounded shadow-sm border">
+        <i class="fas fa-box-open fa-3x mb-3 opacity-50"></i>
+        <h5>No items found.</h5>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+        @foreach (var item in Model)
+        {
+            var badgeColor = item.Type == WEBDEV_Project.Models.ItemType.Lost ? "danger" : "success";
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 hover-lift">
+                    <div class="position-relative">
+                        @if (item.Images.Any(i => i.IsPrimary))
+                        {
+                            <img src="@item.Images.First(i => i.IsPrimary).Path" class="card-img-top" alt="Item Image" style="height: 200px; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted" style="height: 200px;">
+                                <i class="fas fa-image fa-3x opacity-50"></i>
+                            </div>
+                        }
+                        <span class="badge bg-@badgeColor position-absolute top-0 start-0 m-3 fs-6 rounded-pill shadow-sm">@item.Type.ToString().ToUpper()</span>
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold pe-2 text-truncate">@item.Title</h5>
+                        <p class="card-text text-muted small mb-2"><i class="fas fa-tag me-1"></i> @item.Category?.Name</p>
+                        <p class="card-text text-truncate">@item.Description</p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 pt-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted"><i class="far fa-clock me-1"></i> @item.PostedAt.ToLocalTime().ToString("MMM dd")</small>
+                            <a asp-controller="Items" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

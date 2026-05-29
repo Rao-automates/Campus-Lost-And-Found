@@ -1,0 +1,87 @@
+Project Proposal
+Web Application Development Course
+Campus Lost & Found Portal
+An ASP.NET MVC Web Application
+Project ID119577
+CourseWeb Application Development
+DateApril 15, 2026
+Name Student ID
+Mohyuddiin 65405
+Zain Imran 65495
+Shahzaman Khan 64930
+W eb App Development — Project ProposalProject ID: 119577
+Contents
+1 Introduction 2
+2 Problem Statement 2
+3 Objectives 2
+4 Key Features 2
+5 Technology Stack 3
+6 Project Timeline 3
+7 Work Distribution 3
+8 Conclusion 3
+1
+W eb App Development — Project ProposalProject ID: 119577
+1. Introduction
+TheCampus Lost & Found Portalis a web application designed to help students
+and staff report lost items and browse found items posted by others. It solves a common
+everyday problem on any campus or institution where items get misplaced and there is
+no organized way to reunite them with their owners.
+The application will be built usingHTML, CSS, ASP.NET MVC, and C#, covering
+the full course technology stack.
+2. Problem Statement
+When someone loses an item on campus, they have no easy way to check if it has been
+found and handed in somewhere. Similarly, someone who finds an item has no reliable
+way to reach its owner. Currently people rely on notice boards or word of mouth, which
+is slow and ineffective. This portal provides a centralized, searchable solution to this
+problem.
+3. Objectives
+•Allow users to register and log in to the portal.
+•Let users post a lost item or a found item with details and an optional photo.
+•Allow anyone to browse and search posted items by category or location.
+•Let a user mark an item as returned/resolved once it is claimed.
+•Build the application using ASP.NET MVC, C#, HTML, and CSS.
+4. Key Features
+•User Registration & Login— secure accounts using ASP.NET Identity.
+•Post Lost Item— title, description, date lost, location, category (e.g. bag,
+phone, keys), optional image upload.
+•Post Found Item— same fields but from the finder’s perspective.
+•Browse & Search— view all active posts, filter by category or location key-
+word.
+•Mark as Resolved— the post owner can close a listing once the item is re-
+turned.
+•My Posts— a personal page showing only the logged-in user’s listings.
+5. Technology Stack
+2
+W eb App Development — Project ProposalProject ID: 119577
+Layer Technology
+Front-EndHTML5, CSS3, Razor Views (.cshtml)
+Back-EndASP.NET MVC 5, C#
+DatabaseSQL Server LocalDB, Entity Framework
+AuthASP.NET Identity
+IDEVisual Studio 2022
+6. Project Timeline
+Week Task
+1Project setup, database design, Git repository
+2User registration and login (ASP.NET Identity)
+3Lost & Found item model and CRUD operations
+4Browse, search, and filter functionality
+5Image upload and My Posts page
+6Mark as resolved feature and UI styling
+7Testing and bug fixes
+8Final review and submission
+7. Work Distribution
+Name ID Responsibility
+Mohyuddiin 65405Back-end: Controllers, routing,
+ASP.NET Identity, C# logic
+Zain Imran 65495Database: EF models, migrations, CRUD
+operations
+Shahzaman Khan 64930Front-end: HTML/CSS views, Razor
+templates, UI design
+8. Conclusion
+The Campus Lost & Found Portal is a practical and unique web application that addresses
+a real problem students face every day. It is straightforward enough to build within
+the course timeframe while covering all required technologies: HTML, CSS, ASP.NET
+MVC, and C#. The project involves user authentication, database interaction, image
+handling, and a clean searchable interface, making it a well-rounded intermediate-level
+course project.
+3

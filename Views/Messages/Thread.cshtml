@@ -1,0 +1,141 @@
+@model WEBDEV_Project.Models.Claim
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Claim Messages";
+    var userId = UserManager.GetUserId(User);
+    var isPoster = Model.Item!.UserId == userId;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title fw-bold text-primary mb-1"><i class="fas fa-comments me-2"></i>Message Thread</h5>
+                    <p class="text-muted small mb-0">Claim regarding: <strong><a asp-controller="Items" asp-action="Details" asp-route-id="@Model.ItemId">@Model.Item.Title</a></strong></p>
+                </div>
+                <span class="badge bg-@(Model.Status == WEBDEV_Project.Models.ClaimStatus.Pending ? "warning" : Model.Status == WEBDEV_Project.Models.ClaimStatus.Approved ? "success" : "danger") fs-6 rounded-pill">
+                    @Model.Status.ToString()
+                </span>
+            </div>
+            
+            <div class="card-body bg-light" style="height: 400px; overflow-y: auto;" id="messageContainer">
+                @if (!Model.Messages.Any())
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="far fa-comment-dots fa-3x mb-3 opacity-50"></i>
+                        <p>No messages yet. Send a message to start the conversation.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-4 text-center">
+                        <span class="badge bg-secondary">Claim Submitted: @Model.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</span>
+                    </div>
+
+                    @foreach (var msg in Model.Messages)
+                    {
+                        var isMine = msg.SenderId == userId;
+                        <div class="d-flex mb-3 @(isMine ? "justify-content-end" : "justify-content-start")">
+                            <div class="p-3 rounded shadow-sm" style="max-width: 75%; background-color: @(isMine ? "#0d6efd" : "#ffffff"); color: @(isMine ? "white" : "inherit");">
+                                @if (!isMine)
+                                {
+                                    <div class="fw-bold small mb-1 text-primary">@msg.Sender?.DisplayName</div>
+                                }
+                                <div style="white-space: pre-wrap;">@msg.Body</div>
+                                <div class="text-end mt-1" style="font-size: 0.75rem; opacity: 0.8;">
+                                    @msg.SentAt.ToLocalTime().ToString("hh:mm tt")
+                                    @if (isMine && msg.IsRead)
+                                    {
+                                        <i class="fas fa-check-double ms-1"></i>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+            @if (Model.Status != WEBDEV_Project.Models.ClaimStatus.Rejected)
+            {
+                <div class="card-footer bg-white border-top-0 p-3">
+                    <form asp-action="Send" method="post" class="d-flex gap-2">
+                        <input type="hidden" name="claimId" value="@Model.Id" />
+                        <textarea name="body" class="form-control" rows="2" placeholder="Type your message..." required></textarea>
+                        <button type="submit" class="btn btn-primary d-flex align-items-center px-4">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div class="card-footer bg-white border-top-0 p-3 text-center text-danger fw-bold">
+                    This claim has been rejected. Messaging is disabled.
+                </div>
+            }
+        </div>
+
+        @if (isPoster && Model.Status == WEBDEV_Project.Models.ClaimStatus.Pending)
+        {
+            <div class="card shadow-sm border-0 bg-warning bg-opacity-10">
+                <div class="card-body text-center p-4">
+                    <h5 class="fw-bold mb-3">Owner Actions</h5>
+                    <p class="text-muted mb-4">Are you satisfied that this person is the true owner / finder of the item?</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <form asp-controller="Claims" asp-action="Approve" method="post" onsubmit="return confirm('Approve this claim? This will share your contact info or arrange handover.');">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-success px-4"><i class="fas fa-check me-2"></i>Approve Claim</button>
+                        </form>
+                        <form asp-controller="Claims" asp-action="Reject" method="post" onsubmit="return confirm('Reject this claim permanently?');">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-danger px-4"><i class="fas fa-times me-2"></i>Reject Claim</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (Model.Status == WEBDEV_Project.Models.ClaimStatus.Approved)
+        {
+            var myConfirmation = isPoster ? Model.PosterConfirmed : Model.ClaimantConfirmed;
+            var otherConfirmation = isPoster ? Model.ClaimantConfirmed : Model.PosterConfirmed;
+            
+            <div class="card shadow-sm border-0 bg-success bg-opacity-10">
+                <div class="card-body text-center p-4">
+                    <h5 class="fw-bold text-success mb-3"><i class="fas fa-handshake me-2"></i>Claim Approved</h5>
+                    <p class="mb-4">The claim has been approved. Please arrange a time and place to hand over the item.</p>
+                    
+                    @if (!myConfirmation)
+                    {
+                        <form asp-controller="Claims" asp-action="ConfirmHandover" method="post">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-success px-5 py-2 fw-bold shadow-sm">
+                                <i class="fas fa-check-circle me-2"></i>I Confirm Item Handover
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success d-inline-block">
+                            <i class="fas fa-check me-2"></i>You confirmed the handover.
+                            @if (!otherConfirmation)
+                            {
+                                <br/><small class="text-muted">Waiting for the other party to confirm...</small>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            var container = $('#messageContainer');
+            container.scrollTop(container[0].scrollHeight);
+        });
+    </script>
+}

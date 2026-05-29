@@ -1,0 +1,107 @@
+@model IEnumerable<WEBDEV_Project.Models.Item>
+@{
+    ViewData["Title"] = "Home Page";
+    var announcement = ViewBag.Announcement as WEBDEV_Project.Models.Announcement;
+}
+
+@if (announcement != null)
+{
+    <div class="alert alert-info shadow-sm border-0 d-flex align-items-center">
+        <i class="fas fa-bullhorn fa-2x me-3 text-primary"></i>
+        <div>
+            <h5 class="alert-heading mb-1 fw-bold">Campus Announcement</h5>
+            <p class="mb-0">@announcement.Message</p>
+        </div>
+    </div>
+}
+
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm position-relative overflow-hidden" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">
+    <div class="container-fluid py-5 text-center">
+        <h1 class="display-4 fw-bold text-primary mb-3">Campus Lost & Found</h1>
+        <p class="col-md-8 mx-auto fs-5 text-muted mb-4">A community-driven platform to help students and staff recover lost items and report found belongings across the campus.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a asp-controller="Items" asp-action="Create" class="btn btn-primary btn-lg shadow-sm px-4 rounded-pill">
+                <i class="fas fa-plus me-2"></i>Post an Item
+            </a>
+            <a asp-controller="Items" asp-action="Index" class="btn btn-outline-secondary btn-lg shadow-sm px-4 rounded-pill bg-white">
+                <i class="fas fa-search me-2"></i>Browse Items
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row text-center mb-5">
+    <div class="col-md-4 mb-3">
+        <div class="card border-0 shadow-sm h-100 py-3">
+            <div class="card-body">
+                <i class="fas fa-box-open fa-3x text-primary mb-3"></i>
+                <h3 class="fw-bold">@ViewBag.TotalItems</h3>
+                <p class="text-muted mb-0">Total Items Posted</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card border-0 shadow-sm h-100 py-3">
+            <div class="card-body">
+                <i class="fas fa-handshake fa-3x text-success mb-3"></i>
+                <h3 class="fw-bold">@ViewBag.ResolvedItems</h3>
+                <p class="text-muted mb-0">Items Reunited</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card border-0 shadow-sm h-100 py-3">
+            <div class="card-body">
+                <i class="fas fa-tags fa-3x text-warning mb-3"></i>
+                <h3 class="fw-bold">@ViewBag.TotalCategories</h3>
+                <p class="text-muted mb-0">Item Categories</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-2">
+    <h3 class="fw-bold mb-0">Recently Posted Items</h3>
+    <a asp-controller="Items" asp-action="Index" class="text-decoration-none">View All <i class="fas fa-arrow-right ms-1"></i></a>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    @foreach (var item in Model)
+    {
+        var badgeColor = item.Type == WEBDEV_Project.Models.ItemType.Lost ? "danger" : "success";
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 hover-lift">
+                @if (item.Images.Any(i => i.IsPrimary))
+                {
+                    <img src="@item.Images.First(i => i.IsPrimary).Path" class="card-img-top" alt="Item Image" style="height: 200px; object-fit: cover;">
+                }
+                else
+                {
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted" style="height: 200px;">
+                        <i class="fas fa-image fa-3x opacity-50"></i>
+                    </div>
+                }
+                <div class="card-body position-relative">
+                    <span class="badge bg-@badgeColor position-absolute top-0 end-0 m-3 fs-6 rounded-pill">@item.Type.ToString().ToUpper()</span>
+                    <h5 class="card-title fw-bold pe-5 text-truncate">@item.Title</h5>
+                    <p class="card-text text-muted small mb-2"><i class="fas fa-folder me-1"></i> @item.Category?.Name</p>
+                    <p class="card-text text-truncate">@item.Description</p>
+                </div>
+                <div class="card-footer bg-white border-top-0 pt-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted"><i class="far fa-clock me-1"></i> @item.PostedAt.ToLocalTime().ToString("MMM dd")</small>
+                        <a asp-controller="Items" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5 text-muted">
+        <i class="fas fa-box-open fa-3x mb-3 opacity-50"></i>
+        <h5>No items have been posted yet.</h5>
+    </div>
+}

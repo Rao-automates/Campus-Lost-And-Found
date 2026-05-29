@@ -1,0 +1,150 @@
+@model WEBDEV_Project.ViewModels.ProfileDashboardViewModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="row">
+    <!-- Left Sidebar: Profile Summary -->
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm border-0 sticky-top" style="top: 80px;">
+            <div class="card-body text-center p-4">
+                <div class="position-relative d-inline-block mb-3">
+                    @if (!string.IsNullOrEmpty(Model.User.AvatarPath))
+                    {
+                        <img src="@Model.User.AvatarPath" alt="Profile Avatar" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <i class="fas fa-user-circle fa-6x text-muted img-thumbnail rounded-circle"></i>
+                    }
+                </div>
+                <h4 class="fw-bold mb-1">@Model.User.DisplayName</h4>
+                <p class="text-muted small mb-3">Member since @Model.User.CreatedAt.ToString("MMM yyyy")</p>
+                
+                @if (!string.IsNullOrEmpty(Model.User.Bio))
+                {
+                    <p class="small text-muted fst-italic">"@Model.User.Bio"</p>
+                }
+
+                <div class="d-flex justify-content-center text-warning mb-3">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        if (i <= Math.Round(Model.AverageRating))
+                        {
+                            <i class="fas fa-star"></i>
+                        }
+                        else
+                        {
+                            <i class="far fa-star"></i>
+                        }
+                    }
+                    <span class="text-muted ms-2 small">(@Model.AverageRating.ToString("0.0"))</span>
+                </div>
+
+                <div class="d-grid">
+                    <a asp-action="Edit" class="btn btn-outline-primary btn-sm rounded-pill shadow-sm">
+                        <i class="fas fa-user-edit me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-top-0 p-0">
+                <div class="list-group list-group-flush rounded-bottom">
+                    <a asp-action="Index" asp-route-tab="active" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(Model.ActiveTab == "active" ? "active fw-bold" : "")">
+                        <span><i class="fas fa-box-open me-2"></i>Active Posts</span>
+                        <span class="badge bg-primary rounded-pill">@Model.PostCount</span>
+                    </a>
+                    <a asp-action="Index" asp-route-tab="resolved" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(Model.ActiveTab == "resolved" ? "active fw-bold" : "")">
+                        <span><i class="fas fa-check-circle me-2"></i>Resolved</span>
+                        <span class="badge bg-success rounded-pill">@Model.ResolvedCount</span>
+                    </a>
+                    <a asp-action="Index" asp-route-tab="claims" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(Model.ActiveTab == "claims" ? "active fw-bold" : "")">
+                        <span><i class="fas fa-hand-paper me-2"></i>My Claims</span>
+                        <span class="badge bg-warning text-dark rounded-pill">@Model.ClaimCount</span>
+                    </a>
+                    <a asp-action="Index" asp-route-tab="bookmarks" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(Model.ActiveTab == "bookmarks" ? "active fw-bold" : "")">
+                        <span><i class="fas fa-bookmark me-2"></i>Saved</span>
+                        <span class="badge bg-secondary rounded-pill">@Model.BookmarkCount</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Content Area -->
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0 text-capitalize">@Model.ActiveTab Items</h3>
+            <a asp-controller="Items" asp-action="Create" class="btn btn-primary shadow-sm rounded-pill px-3">
+                <i class="fas fa-plus me-2"></i>Post New Item
+            </a>
+        </div>
+
+        @if (Model.ActiveTab == "active")
+        {
+            @await Html.PartialAsync("_ItemGrid", Model.ActiveItems)
+        }
+        else if (Model.ActiveTab == "resolved")
+        {
+            @await Html.PartialAsync("_ItemGrid", Model.ResolvedItems)
+        }
+        else if (Model.ActiveTab == "bookmarks")
+        {
+            @await Html.PartialAsync("_ItemGrid", Model.BookmarkedItems)
+        }
+        else if (Model.ActiveTab == "claims")
+        {
+            @if (!Model.MyClaims.Any())
+            {
+                <div class="text-center py-5 text-muted bg-white rounded shadow-sm border">
+                    <i class="fas fa-hand-paper fa-3x mb-3 opacity-50"></i>
+                    <h5>You haven't made any claims.</h5>
+                </div>
+            }
+            else
+            {
+                <div class="list-group shadow-sm">
+                    @foreach (var claim in Model.MyClaims)
+                    {
+                        var claimColor = claim.Status == WEBDEV_Project.Models.ClaimStatus.Pending ? "warning" : 
+                                         claim.Status == WEBDEV_Project.Models.ClaimStatus.Approved ? "success" : "danger";
+                        <div class="list-group-item list-group-item-action p-4 border-0 border-bottom">
+                            <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                                <h5 class="mb-1 fw-bold text-truncate" style="max-width: 60%;">
+                                    <a asp-controller="Items" asp-action="Details" asp-route-id="@claim.ItemId" class="text-decoration-none">@claim.Item?.Title</a>
+                                </h5>
+                                <span class="badge bg-@claimColor px-3 py-2 rounded-pill shadow-sm">@claim.Status.ToString().ToUpper()</span>
+                            </div>
+                            <p class="mb-2 text-muted small"><i class="far fa-clock me-1"></i> Claimed on @claim.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</p>
+                            <p class="mb-3">@claim.Message</p>
+                            
+                            <a asp-controller="Messages" asp-action="Thread" asp-route-claimId="@claim.Id" class="btn btn-outline-primary btn-sm rounded-pill px-4 shadow-sm">
+                                <i class="fas fa-comments me-2"></i>Message Thread
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        }
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-tab="@Model.ActiveTab" asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-tab="@Model.ActiveTab" asp-route-page="@i">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-tab="@Model.ActiveTab" asp-route-page="@(Model.CurrentPage + 1)">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+</div>

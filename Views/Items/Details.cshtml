@@ -1,0 +1,317 @@
+@model WEBDEV_Project.ViewModels.ItemDetailViewModel
+@{
+    ViewData["Title"] = Model.Item.Title;
+}
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow-sm border-0 mb-4">
+            <!-- Carousel for Images -->
+            @if (Model.Item.Images.Any())
+            {
+                <div id="itemCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        @for (int i = 0; i < Model.Item.Images.Count; i++)
+                        {
+                            <button type="button" data-bs-target="#itemCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"></button>
+                        }
+                    </div>
+                    <div class="carousel-inner bg-light rounded-top" style="height: 400px;">
+                        @foreach (var img in Model.Item.Images.Select((value, index) => new { value, index }))
+                        {
+                            <div class="carousel-item h-100 @(img.index == 0 ? "active" : "")">
+                                <img src="@img.value.Path" class="d-block w-100 h-100" style="object-fit: contain;" alt="Item Image @img.index">
+                            </div>
+                        }
+                    </div>
+                    @if (Model.Item.Images.Count > 1)
+                    {
+                        <button class="carousel-control-prev" type="button" data-bs-target="#itemCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#itemCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="bg-light d-flex align-items-center justify-content-center text-muted rounded-top" style="height: 300px;">
+                    <div class="text-center">
+                        <i class="fas fa-image fa-4x mb-3 opacity-50"></i>
+                        <p>No images available for this item.</p>
+                    </div>
+                </div>
+            }
+
+            <div class="card-body p-4 position-relative">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <span class="badge bg-@(Model.Item.Type == WEBDEV_Project.Models.ItemType.Lost ? "danger" : "success") fs-6 rounded-pill mb-2">
+                            @Model.Item.Type.ToString().ToUpper()
+                        </span>
+                        <h2 class="card-title fw-bold">@Model.Item.Title</h2>
+                    </div>
+                    @if (User.Identity!.IsAuthenticated)
+                    {
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary rounded-circle shadow-sm btn-bookmark" data-id="@Model.Item.Id" title="Save this item">
+                                <i class="@(Model.IsBookmarked ? "fas text-primary" : "far") fa-bookmark"></i>
+                            </button>
+                            <button class="btn btn-outline-danger rounded-circle shadow-sm btn-flag" data-id="@Model.Item.Id" title="Report this item" data-bs-toggle="modal" data-bs-target="#flagModal">
+                                <i class="far fa-flag"></i>
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <div class="row text-muted small mb-4 bg-light p-3 rounded">
+                    <div class="col-md-4 mb-2 mb-md-0">
+                        <i class="fas fa-user-circle text-primary me-1"></i> Posted by: @Model.Item.User?.DisplayName
+                    </div>
+                    <div class="col-md-4 mb-2 mb-md-0">
+                        <i class="far fa-clock text-primary me-1"></i> @Model.Item.PostedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-eye text-primary me-1"></i> @Model.Item.ViewCount Views
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-3">Description</h5>
+                <p class="card-text mb-4" style="white-space: pre-line;">@Model.Item.Description</p>
+
+                <h5 class="fw-bold mb-3">Details</h5>
+                <ul class="list-group list-group-flush border rounded mb-4">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fas fa-folder me-2"></i>Category</span>
+                        <span class="fw-semibold">@Model.Item.Category?.Name</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fas fa-building me-2"></i>Campus Building</span>
+                        <span class="fw-semibold">@(Model.Item.Building?.Name ?? "Not specified")</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>Specific Location</span>
+                        <span class="fw-semibold">@(Model.Item.LocationDetail ?? "Not specified")</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span class="text-muted"><i class="far fa-calendar-alt me-2"></i>Date Occurred</span>
+                        <span class="fw-semibold">@Model.Item.DateOccurred.ToString("MMM dd, yyyy")</span>
+                    </li>
+                    @if (Model.Item.Reward.HasValue && Model.Item.Reward > 0)
+                    {
+                        <li class="list-group-item d-flex justify-content-between bg-success bg-opacity-10">
+                            <span class="text-success fw-bold"><i class="fas fa-gift me-2"></i>Reward Offered</span>
+                            <span class="text-success fw-bold">@Model.Item.Reward.Value.ToString("C")</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="col-lg-4">
+        <!-- Status & Actions Card -->
+        <div class="card shadow-sm border-0 mb-4 sticky-top" style="top: 80px;">
+            <div class="card-body text-center p-4">
+                <h5 class="fw-bold mb-3">Item Status</h5>
+                
+                @if (Model.Item.Status == WEBDEV_Project.Models.ItemStatus.Resolved)
+                {
+                    <div class="alert alert-success fw-bold py-3 mb-0">
+                        <i class="fas fa-check-circle fa-2x mb-2 d-block"></i>
+                        THIS ITEM HAS BEEN RESOLVED
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning fw-bold py-3 mb-4">
+                        <i class="fas fa-exclamation-circle fa-2x mb-2 d-block"></i>
+                        CURRENTLY ACTIVE
+                    </div>
+
+                    @if (Model.IsOwner)
+                    {
+                        <hr />
+                        <h6 class="text-muted fw-bold mb-3">Owner Actions</h6>
+                        <div class="d-grid gap-2">
+                            <a asp-action="Edit" asp-route-id="@Model.Item.Id" class="btn btn-outline-primary">
+                                <i class="fas fa-edit me-2"></i>Edit Item
+                            </a>
+                            <form asp-action="Resolve" method="post" onsubmit="return confirm('Are you sure this item has been reunited/resolved?');">
+                                <input type="hidden" name="id" value="@Model.Item.Id" />
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-check me-2"></i>Mark as Resolved
+                                </button>
+                            </form>
+                            <form asp-action="Delete" method="post" onsubmit="return confirm('Are you sure you want to permanently remove this item?');">
+                                <input type="hidden" name="id" value="@Model.Item.Id" />
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="fas fa-trash-alt me-2"></i>Remove Item
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else if (User.Identity!.IsAuthenticated)
+                    {
+                        if (Model.ClaimsByCurrentUser != null)
+                        {
+                            <hr />
+                            <h6 class="text-muted fw-bold mb-3">Your Claim Status</h6>
+                            var claim = Model.ClaimsByCurrentUser;
+                            var claimColor = claim.Status == WEBDEV_Project.Models.ClaimStatus.Pending ? "warning" : 
+                                            claim.Status == WEBDEV_Project.Models.ClaimStatus.Approved ? "success" : "danger";
+                                            
+                            <div class="alert alert-@claimColor text-center mb-3">
+                                <strong>Status:</strong> @claim.Status.ToString()
+                            </div>
+                            
+                            <a asp-controller="Messages" asp-action="Thread" asp-route-claimId="@claim.Id" class="btn btn-primary w-100">
+                                <i class="fas fa-comments me-2"></i>View Claim Messages
+                            </a>
+                        }
+                        else if (Model.CanClaim)
+                        {
+                            <hr />
+                            <h6 class="text-muted fw-bold mb-3">Is this yours? / Do you have it?</h6>
+                            <button type="button" class="btn btn-primary w-100 btn-lg shadow-sm" data-bs-toggle="modal" data-bs-target="#claimModal">
+                                <i class="fas fa-hand-paper me-2"></i>Submit Claim
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        <hr />
+                        <p class="text-muted small">Please <a asp-controller="Account" asp-action="Login">login</a> to claim this item or contact the owner.</p>
+                    }
+                }
+            </div>
+        </div>
+
+        @if (Model.IsOwner && Model.Item.Claims.Any())
+        {
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white fw-bold">
+                    <i class="fas fa-inbox me-2 text-primary"></i> Claims Received (@Model.Item.Claims.Count)
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var claim in Model.Item.Claims.OrderByDescending(c => c.CreatedAt))
+                    {
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong>@claim.Claimant?.DisplayName</strong>
+                                <span class="badge bg-@(claim.Status == WEBDEV_Project.Models.ClaimStatus.Pending ? "warning" : claim.Status == WEBDEV_Project.Models.ClaimStatus.Approved ? "success" : "danger")">@claim.Status</span>
+                            </div>
+                            <p class="small text-muted text-truncate mb-2">@claim.Message</p>
+                            <a asp-controller="Messages" asp-action="Thread" asp-route-claimId="@claim.Id" class="btn btn-sm btn-outline-primary w-100">Review & Reply</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Claim Modal -->
+@if (Model.CanClaim)
+{
+    <div class="modal fade" id="claimModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form asp-controller="Claims" asp-action="Submit" method="post">
+                    <input type="hidden" name="ItemId" value="@Model.Item.Id" />
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-hand-paper me-2"></i>Submit Claim</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info small">
+                            Submitting a claim opens a private messaging thread between you and the item poster. Please provide specific details to prove ownership or describe where you found it.
+                        </div>
+                        <div class="mb-3">
+                            <label for="Message" class="form-label fw-bold">Message to Owner</label>
+                            <textarea name="Message" id="Message" class="form-control" rows="4" placeholder="Describe specific marks, contents, or passwords to prove it's yours..." required></textarea>
+                            <span class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Claim</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Flag Modal -->
+@if (User.Identity!.IsAuthenticated)
+{
+    <div class="modal fade" id="flagModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="flagForm" onsubmit="submitFlag(event)">
+                    <input type="hidden" id="flagItemId" value="@Model.Item.Id" />
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title"><i class="fas fa-flag me-2"></i>Report Item</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Reason for reporting</label>
+                            <select id="flagReason" class="form-select" required>
+                                <option value="">Select a reason...</option>
+                                <option value="Inappropriate Content">Inappropriate Content</option>
+                                <option value="Spam / Fake">Spam / Fake</option>
+                                <option value="Wrong Category">Wrong Category</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Submit Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            $('.btn-bookmark').click(function() {
+                var btn = $(this);
+                var icon = btn.find('i');
+                var id = btn.data('id');
+
+                $.post('/Items/Bookmark', { id: id, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() }, function(res) {
+                    if (res.bookmarked) {
+                        icon.removeClass('far').addClass('fas text-primary');
+                        btn.addClass('border-primary');
+                    } else {
+                        icon.removeClass('fas text-primary').addClass('far');
+                        btn.removeClass('border-primary');
+                    }
+                });
+            });
+        });
+
+        function submitFlag(e) {
+            e.preventDefault();
+            var id = $('#flagItemId').val();
+            var reason = $('#flagReason').val();
+
+            $.post('/Items/Flag', { id: id, reason: reason, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() }, function(res) {
+                $('#flagModal').modal('hide');
+                alert('Item reported successfully. Current flags: ' + res.flagCount);
+            });
+        }
+    </script>
+}
