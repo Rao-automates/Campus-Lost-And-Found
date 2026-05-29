@@ -39,6 +39,10 @@ namespace WEBDEV_Project.Controllers
             if (existingClaim)
                 return BadRequest("You have already claimed this item.");
 
+            var hasApprovedClaim = await _db.Claims.AnyAsync(c => c.ItemId == vm.ItemId && c.Status == ClaimStatus.Approved);
+            if (hasApprovedClaim)
+                return BadRequest("This item already has an approved claim pending handover.");
+
             var claim = new Claim
             {
                 ItemId = vm.ItemId,

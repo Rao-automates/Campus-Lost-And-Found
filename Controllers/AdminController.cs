@@ -174,6 +174,27 @@ namespace WEBDEV_Project.Controllers
             return RedirectToAction(nameof(Users));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                user.IsActive = false;
+                user.DisplayName = "Deleted User";
+                user.Bio = null;
+                user.AvatarPath = null;
+                user.PhoneNumber = null;
+
+                await _userManager.UpdateSecurityStampAsync(user); // Force logout
+                LogAdminAction("DeleteUser", "User", id);
+                await _db.SaveChangesAsync();
+                TempData["Success"] = "User deleted and anonymized.";
+            }
+            return RedirectToAction(nameof(Users));
+        }
+
         [HttpGet]
         public async Task<IActionResult> Flags(int page = 1)
         {

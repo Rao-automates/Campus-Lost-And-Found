@@ -2,9 +2,9 @@
 
 @if (!Model.Any())
 {
-    <div class="text-center py-5 text-muted bg-white rounded shadow-sm border">
+    <div class="text-center py-5 text-muted glass-card">
         <i class="fas fa-box-open fa-3x mb-3 opacity-50"></i>
-        <h5>No items found.</h5>
+        <h5 class="text-white">No items found.</h5>
     </div>
 }
 else
@@ -14,7 +14,7 @@ else
         {
             var badgeColor = item.Type == WEBDEV_Project.Models.ItemType.Lost ? "danger" : "success";
             <div class="col">
-                <div class="card h-100 shadow-sm border-0 hover-lift">
+                <div class="item-card h-100">
                     <div class="position-relative">
                         @if (item.Images.Any(i => i.IsPrimary))
                         {
@@ -22,7 +22,7 @@ else
                         }
                         else
                         {
-                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted" style="height: 200px;">
+                            <div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="height: 200px; background: rgba(0,0,0,0.2);">
                                 <i class="fas fa-image fa-3x opacity-50"></i>
                             </div>
                         }
@@ -30,13 +30,13 @@ else
                     </div>
 
                     <div class="card-body">
-                        <h5 class="card-title fw-bold pe-2 text-truncate">@item.Title</h5>
-                        <p class="card-text text-muted small mb-2"><i class="fas fa-tag me-1"></i> @item.Category?.Name</p>
-                        <p class="card-text text-truncate">@item.Description</p>
+                        <h5 class="card-title fw-bold pe-2 text-truncate text-white">@item.Title</h5>
+                        <p class="card-text text-secondary small mb-2"><i class="fas fa-tag me-1"></i> @item.Category?.Name</p>
+                        <p class="card-text text-truncate text-white opacity-75">@item.Description</p>
                     </div>
-                    <div class="card-footer bg-white border-top-0 pt-0">
+                    <div class="item-content p-3 border-top border-secondary bg-dark bg-opacity-25">
                         <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted"><i class="far fa-clock me-1"></i> @item.PostedAt.ToLocalTime().ToString("MMM dd")</small>
+                            <small class="text-secondary"><i class="far fa-clock me-1"></i> @item.PostedAt.ToLocalTime().ToString("MMM dd")</small>
                             <a asp-controller="Items" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3">View</a>
                         </div>
                     </div>

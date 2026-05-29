@@ -48,7 +48,32 @@ namespace WEBDEV_Project.Controllers
             var isOwner = item.UserId == userId;
             var isBookmarked = userId != null && await _db.UserBookmarks.AnyAsync(b => b.UserId == userId && b.ItemId == id);
             var userClaim = userId != null ? item.Claims.FirstOrDefault(c => c.ClaimantId == userId) : null;
-            var canClaim = userId != null && !isOwner && userClaim == null && item.Status == ItemStatus.Active;
+            var hasApprovedClaim = item.Claims.Any(c => c.Status == ClaimStatus.Approved);
+            var canClaim = userId != null && !isOwner && userClaim == null && item.Status == ItemStatus.Active && !hasApprovedClaim;
+
+            Rating? existingRating = null;
+            ApplicationUser? userToRate = null;
+
+            if (item.Status == ItemStatus.Resolved && userId != null)
+            {
+                var approvedClaim = item.Claims.FirstOrDefault(c => c.Status == ClaimStatus.Approved);
+                if (approvedClaim != null)
+                {
+                    if (isOwner)
+                    {
+                        userToRate = approvedClaim.Claimant;
+                    }
+                    else if (approvedClaim.ClaimantId == userId)
+                    {
+                        userToRate = item.User;
+                    }
+
+                    if (userToRate != null)
+                    {
+                        existingRating = await _db.Ratings.FirstOrDefaultAsync(r => r.ItemId == id && r.RaterId == userId);
+                    }
+                }
+            }
 
             var vm = new ItemDetailViewModel
             {
@@ -57,7 +82,9 @@ namespace WEBDEV_Project.Controllers
                 IsBookmarked = isBookmarked,
                 ClaimsByCurrentUser = userClaim,
                 CanClaim = canClaim,
-                ClaimForm = new SubmitClaimViewModel { ItemId = id }
+                ClaimForm = new SubmitClaimViewModel { ItemId = id },
+                ExistingRating = existingRating,
+                UserToRate = userToRate
             };
 
             return View(vm);
@@ -224,6 +251,33 @@ namespace WEBDEV_Project.Controllers
         {
             var count = await _itemService.AddFlagAsync(_userManager.GetUserId(User)!, id, reason);
             return Json(new { flagCount = count });
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitRating(int itemId, string ratedUserId, int stars, string? comment)
+        {
+            var raterId = _userManager.GetUserId(User)!;
+            
+            // Check if already rated
+            var existing = await _db.Ratings.AnyAsync(r => r.ItemId == itemId && r.RaterId == raterId);
+            if (!existing)
+            {
+                var rating = new Rating
+                {
+                    ItemId = itemId,
+                    RaterId = raterId,
+                    RatedUserId = ratedUserId,
+                    Stars = stars < 1 ? 1 : (stars > 5 ? 5 : stars),
+                    Comment = comment,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _db.Ratings.Add(rating);
+                await _db.SaveChangesAsync();
+                TempData["Success"] = "Your review has been submitted!";
+            }
+            return RedirectToAction(nameof(Details), new { id = itemId });
         }
 
         [HttpGet]

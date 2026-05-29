@@ -43,4 +43,12 @@ namespace WEBDEV_Project.ViewModels
         public int TotalPages { get; set; } = 1;
         public string ActiveTab { get; set; } = "active";
     }
+
+    public class UserProfileViewModel
+    {
+        public ApplicationUser User { get; set; } = new ApplicationUser();
+        public IEnumerable<Item> ActiveItems { get; set; } = new List<Item>();
+        public IEnumerable<Rating> Ratings { get; set; } = new List<Rating>();
+        public double AverageRating { get; set; }
+    }
 }

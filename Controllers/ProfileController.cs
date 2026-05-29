@@ -14,12 +14,14 @@ namespace WEBDEV_Project.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IImageService _imageService;
 
-        public ProfileController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, IImageService imageService)
+        public ProfileController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IImageService imageService)
         {
             _db = db;
             _userManager = userManager;
+            _signInManager = signInManager;
             _imageService = imageService;
         }
 
@@ -121,6 +123,62 @@ namespace WEBDEV_Project.Controllers
             await _userManager.UpdateAsync(user);
             TempData["Success"] = "Profile updated successfully.";
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Public(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            var activeItems = await _db.Items
+                .Include(i => i.Images)
+                .Include(i => i.Category)
+                .Where(i => i.UserId == id && i.Status == ItemStatus.Active && !i.IsDeleted)
+                .OrderByDescending(i => i.PostedAt)
+                .Take(10)
+                .ToListAsync();
+
+            var ratings = await _db.Ratings
+                .Include(r => r.Rater)
+                .Include(r => r.Item)
+                .Where(r => r.RatedUserId == id)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
+            double avgRating = ratings.Any() ? ratings.Average(r => r.Stars) : 0;
+
+            var vm = new UserProfileViewModel
+            {
+                User = user,
+                ActiveItems = activeItems,
+                Ratings = ratings,
+                AverageRating = avgRating
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            // Soft delete user
+            user.IsActive = false;
+            user.DisplayName = "Deleted User";
+            user.Bio = null;
+            user.AvatarPath = null;
+            user.PhoneNumber = null;
+
+            await _userManager.UpdateAsync(user);
+            await _signInManager.SignOutAsync();
+
+            TempData["Success"] = "Your account has been deleted.";
+            return RedirectToAction("Index", "Home");
         }
     }
 }

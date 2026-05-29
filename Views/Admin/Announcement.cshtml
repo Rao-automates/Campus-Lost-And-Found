@@ -1,0 +1,64 @@
+@model WEBDEV_Project.Models.Announcement
+@{
+    ViewData["Title"] = "Set Announcement";
+}
+
+<div class="row justify-content-center animate-fade-in-up">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 48px; height: 48px; background: rgba(245, 158, 11, 0.15);">
+                    <i class="fas fa-bullhorn text-warning fs-5"></i>
+                </div>
+                <h2 class="fw-bold text-white mb-0" style="font-family: var(--font-heading);">Set Announcement</h2>
+            </div>
+            <a asp-action="Dashboard" class="btn btn-outline-secondary rounded-pill px-4 py-2 d-flex align-items-center transition-all hover-text-white">
+                <i class="fas fa-arrow-left me-2"></i>Back
+            </a>
+        </div>
+
+        <div class="glass-panel mb-4 p-0 overflow-hidden border-warning border-opacity-25">
+            <div class="p-4 p-md-5 bg-dark bg-opacity-25 border-bottom border-light text-center position-relative">
+                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top, rgba(245, 158, 11, 0.15), transparent 70%); pointer-events: none;"></div>
+                <div class="position-relative z-1">
+                    <h4 class="fw-bold text-white mb-2" style="font-family: var(--font-heading);">Global Announcement Banner</h4>
+                    <p class="text-secondary fs-6 mb-0">This message will be displayed at the top of every page for all users.</p>
+                </div>
+            </div>
+            
+            <div class="p-4 p-md-5">
+                <form asp-action="SetAnnouncement" method="post">
+                    <div class="mb-5">
+                        <label class="form-label text-secondary fw-medium small mb-2 text-uppercase tracking-wider">Announcement Message</label>
+                        <div class="position-relative">
+                            <textarea name="message" class="form-control bg-dark bg-opacity-50 text-white border-light rounded-4 p-3 shadow-inner" rows="5" placeholder="Enter announcement text here. Leave blank to clear the current announcement." style="resize: vertical; min-height: 120px;">@(Model?.Message)</textarea>
+                            <div class="position-absolute top-0 end-0 p-3 pointer-events-none">
+                                <i class="fas fa-pen text-secondary opacity-25"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-warning px-4 py-3 fw-bold fs-6 shadow-lg d-flex align-items-center justify-content-center text-dark" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none;">
+                            <i class="fas fa-save me-2"></i> Save Announcement
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            @if (Model != null && !string.IsNullOrEmpty(Model.Message))
+            {
+                <div class="p-4 p-md-5 bg-dark bg-opacity-50 border-top border-warning border-opacity-25">
+                    <h6 class="text-secondary fw-bold small text-uppercase tracking-wider mb-3">Live Preview</h6>
+                    <div class="alert bg-warning bg-opacity-10 border border-warning border-opacity-50 text-white mb-0 shadow-sm rounded-4 d-flex align-items-start p-4">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 40px; height: 40px; background: rgba(245, 158, 11, 0.2);">
+                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                        </div>
+                        <div class="pt-2 lh-base text-warning text-opacity-75">
+                            @Model.Message
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

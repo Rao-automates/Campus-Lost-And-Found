@@ -3,47 +3,75 @@
     ViewData["Title"] = "Notifications";
 }
 
-<div class="row justify-content-center">
+<div class="row justify-content-center animate-fade-in-up">
     <div class="col-md-8">
-        <div class="card shadow-sm border-0 mt-4 mb-5">
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h3 class="card-title fw-bold text-primary mb-0"><i class="fas fa-bell me-2"></i>Notifications</h3>
-                @if (Model.Any(n => !n.IsRead))
-                {
-                    <form asp-action="MarkAllRead" method="post">
-                        <button type="submit" class="btn btn-sm btn-outline-primary">Mark all as read</button>
-                    </form>
-                }
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-light">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 48px; height: 48px; background: rgba(59, 130, 246, 0.15);">
+                    <i class="fas fa-bell text-primary fs-5"></i>
+                </div>
+                <h2 class="fw-bold text-white mb-0" style="font-family: var(--font-heading);">Notifications</h2>
             </div>
-            
-            <div class="list-group list-group-flush">
+            @if (Model.Any(n => !n.IsRead))
+            {
+                <form asp-action="MarkAllRead" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-primary rounded-pill px-4 py-2 d-flex align-items-center transition-all hover-text-white text-sm fw-medium">
+                        <i class="fas fa-check-double me-2"></i>Mark all as read
+                    </button>
+                </form>
+            }
+        </div>
+
+        <div class="glass-panel p-0 overflow-hidden mb-5">
+            <div class="list-group list-group-flush bg-transparent">
                 @if (!Model.Any())
                 {
-                    <div class="text-center py-5 text-muted">
-                        <i class="far fa-bell-slash fa-3x mb-3 opacity-50"></i>
-                        <p>You have no notifications.</p>
+                    <div class="text-center py-5">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; background: rgba(255,255,255,0.05);">
+                            <i class="far fa-bell-slash fa-3x text-secondary opacity-50"></i>
+                        </div>
+                        <p class="text-secondary fw-medium fs-5 mb-0">You have no notifications.</p>
+                        <p class="text-secondary small mt-2 opacity-75">When you get notifications, they'll show up here.</p>
                     </div>
                 }
                 else
                 {
                     foreach (var n in Model)
                     {
-                        <div class="list-group-item p-3 @(n.IsRead ? "bg-white" : "bg-light border-start border-4 border-primary")">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h6 class="mb-1 fw-bold @(n.IsRead ? "text-muted" : "text-dark")">@n.Type</h6>
-                                    <p class="mb-1">@n.Message</p>
-                                    <small class="text-muted"><i class="far fa-clock me-1"></i> @n.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</small>
+                        var isUnread = !n.IsRead;
+                        var bgClass = isUnread ? "bg-dark bg-opacity-50" : "bg-transparent";
+                        var borderClass = isUnread ? "border-start border-4 border-primary border-opacity-75" : "border-start border-4 border-transparent";
+                        var textClass = isUnread ? "text-white fw-bold" : "text-light fw-medium";
+
+                        <div class="list-group-item p-4 border-0 border-bottom border-light transition-all hover-bg-light-subtle @bgClass @borderClass" style="border-bottom-color: rgba(255,255,255,0.08) !important;">
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width: 40px; height: 40px; background: @(isUnread ? "rgba(59, 130, 246, 0.15)" : "rgba(255,255,255,0.05)");">
+                                    <i class="fas fa-bell @(isUnread ? "text-primary" : "text-secondary") small"></i>
                                 </div>
-                                <div class="d-flex flex-column align-items-end">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 @textClass d-flex align-items-center gap-2">
+                                        @n.Type
+                                        @if (isUnread)
+                                        {
+                                            <span class="badge bg-primary rounded-pill px-2 py-1 shadow-sm" style="font-size: 0.6rem;">NEW</span>
+                                        }
+                                    </h6>
+                                    <p class="mb-2 text-white opacity-75 fs-6 lh-base">@n.Message</p>
+                                    <small class="text-white opacity-50 d-flex align-items-center">
+                                        <i class="far fa-clock me-1"></i> @n.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy • h:mm tt")
+                                    </small>
+                                </div>
+                                <div class="d-flex flex-column align-items-end flex-shrink-0 gap-2">
                                     @if (!string.IsNullOrEmpty(n.Link))
                                     {
-                                        <a href="@n.Link" class="btn btn-sm btn-outline-primary rounded-pill mb-2">View</a>
+                                        <a href="@n.Link" class="btn btn-sm btn-outline-primary rounded-pill px-3 transition-all hover-text-white d-flex align-items-center text-nowrap">
+                                            View <i class="fas fa-arrow-right ms-2 small"></i>
+                                        </a>
                                     }
                                     @if (!n.IsRead)
                                     {
-                                        <button class="btn btn-sm text-muted mark-read-btn" data-id="@n.Id" title="Mark as read">
-                                            <i class="fas fa-check"></i>
+                                        <button class="btn btn-sm text-secondary hover-text-success mark-read-btn transition-colors border-0 bg-transparent p-1" data-id="@n.Id" title="Mark as read" data-bs-toggle="tooltip">
+                                            <i class="fas fa-check-circle fs-5"></i>
                                         </button>
                                     }
                                 </div>
@@ -59,12 +87,34 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
             $('.mark-read-btn').click(function() {
                 var btn = $(this);
                 var id = btn.data('id');
                 $.post('/Notifications/MarkRead', { id: id, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() }, function() {
-                    btn.closest('.list-group-item').removeClass('bg-light border-start border-4 border-primary').addClass('bg-white');
-                    btn.hide();
+                    var item = btn.closest('.list-group-item');
+                    item.removeClass('bg-dark bg-opacity-50 border-start border-4 border-primary border-opacity-75')
+                        .addClass('bg-transparent border-start border-4 border-transparent');
+                    
+                    item.find('h6.text-white').removeClass('text-white fw-bold').addClass('text-light fw-medium');
+                    item.find('.badge.bg-primary').fadeOut(300, function() { $(this).remove(); });
+                    
+                    var iconContainer = item.find('.rounded-circle').first();
+                    iconContainer.css('background', 'rgba(255,255,255,0.05)');
+                    iconContainer.find('i').removeClass('text-primary').addClass('text-secondary');
+                    
+                    // Hide tooltip before removing button to prevent hanging tooltips
+                    var tooltip = bootstrap.Tooltip.getInstance(btn[0]);
+                    if (tooltip) {
+                        tooltip.hide();
+                    }
+                    
+                    btn.fadeOut(300);
                     
                     // Update badge logic manually if desired
                 });

@@ -78,6 +78,8 @@ namespace WEBDEV_Project.ViewModels
         public Claim? ClaimsByCurrentUser { get; set; }
         public bool CanClaim { get; set; }
         public SubmitClaimViewModel ClaimForm { get; set; } = new SubmitClaimViewModel();
+        public Rating? ExistingRating { get; set; }
+        public ApplicationUser? UserToRate { get; set; }
     }
 
     public class SubmitClaimViewModel

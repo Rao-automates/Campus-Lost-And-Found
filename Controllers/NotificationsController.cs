@@ -48,5 +48,20 @@ namespace WEBDEV_Project.Controllers
             var count = await _notificationService.GetUnreadCountAsync(_userManager.GetUserId(User)!);
             return Json(new { count });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Dropdown()
+        {
+            if (!User.Identity!.IsAuthenticated) return Json(new object[0]);
+            var all = await _notificationService.GetAllAsync(_userManager.GetUserId(User)!);
+            var latest = all.Take(5).Select(n => new {
+                n.Id,
+                n.Message,
+                n.Link,
+                n.IsRead,
+                CreatedAt = n.CreatedAt.ToLocalTime().ToString("MMM dd, HH:mm")
+            });
+            return Json(latest);
+        }
     }
 }

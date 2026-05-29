@@ -3,114 +3,153 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-primary mb-0"><i class="fas fa-cog me-2"></i>Admin Dashboard</h2>
-</div>
-
-<div class="row mb-4">
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card shadow-sm border-0 bg-primary text-white h-100 hover-lift">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1 opacity-75">Total Items</h6>
-                        <h2 class="fw-bold mb-0">@Model.TotalItems</h2>
-                    </div>
-                    <i class="fas fa-boxes fa-3x opacity-50"></i>
-                </div>
-            </div>
-            <a asp-action="Items" class="card-footer text-white text-decoration-none d-flex justify-content-between align-items-center bg-dark bg-opacity-25 border-0">
-                <span class="small">View Details</span>
-                <i class="fas fa-angle-right"></i>
-            </a>
+<div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in-up border-bottom border-light pb-3">
+    <div class="d-flex align-items-center">
+        <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 48px; height: 48px; background: rgba(59, 130, 246, 0.15);">
+            <i class="fas fa-cog text-primary fs-5"></i>
         </div>
-    </div>
-    
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card shadow-sm border-0 bg-success text-white h-100 hover-lift">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1 opacity-75">Resolved</h6>
-                        <h2 class="fw-bold mb-0">@Model.ResolvedItems</h2>
-                    </div>
-                    <i class="fas fa-check-circle fa-3x opacity-50"></i>
-                </div>
-            </div>
-            <a asp-action="Items" asp-route-status="Resolved" class="card-footer text-white text-decoration-none d-flex justify-content-between align-items-center bg-dark bg-opacity-25 border-0">
-                <span class="small">View Details</span>
-                <i class="fas fa-angle-right"></i>
-            </a>
-        </div>
-    </div>
-    
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card shadow-sm border-0 bg-info text-white h-100 hover-lift">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1 opacity-75">Total Users</h6>
-                        <h2 class="fw-bold mb-0">@Model.TotalUsers</h2>
-                    </div>
-                    <i class="fas fa-users fa-3x opacity-50"></i>
-                </div>
-            </div>
-            <a asp-action="Users" class="card-footer text-white text-decoration-none d-flex justify-content-between align-items-center bg-dark bg-opacity-25 border-0">
-                <span class="small">Manage Users</span>
-                <i class="fas fa-angle-right"></i>
-            </a>
-        </div>
-    </div>
-    
-    <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card shadow-sm border-0 bg-danger text-white h-100 hover-lift">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase mb-1 opacity-75">Flagged</h6>
-                        <h2 class="fw-bold mb-0">@Model.FlaggedItemsCount</h2>
-                    </div>
-                    <i class="fas fa-flag fa-3x opacity-50"></i>
-                </div>
-            </div>
-            <a asp-action="Flags" class="card-footer text-white text-decoration-none d-flex justify-content-between align-items-center bg-dark bg-opacity-25 border-0">
-                <span class="small">Review Flags</span>
-                <i class="fas fa-angle-right"></i>
-            </a>
-        </div>
+        <h2 class="fw-bold text-white mb-0" style="font-family: var(--font-heading);">Admin Dashboard</h2>
     </div>
 </div>
 
-<div class="row">
+<div class="row mb-4 animate-fade-in-up" style="animation-delay: 0.1s;">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="glass-panel p-0 h-100 position-relative overflow-hidden hover-lift transition-all" style="border: 1px solid rgba(59, 130, 246, 0.3);">
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent 70%); pointer-events: none;"></div>
+            <div class="p-4 position-relative z-1">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h6 class="text-uppercase text-primary fw-bold tracking-wider mb-1" style="font-size: 0.75rem;">Total Items</h6>
+                        <h2 class="fw-bold text-white mb-0 lh-1">@Model.TotalItems</h2>
+                    </div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: rgba(59, 130, 246, 0.15);">
+                        <i class="fas fa-boxes text-primary fs-4"></i>
+                    </div>
+                </div>
+            </div>
+            <a asp-action="Items" class="text-decoration-none d-flex justify-content-between align-items-center px-4 py-3 bg-dark bg-opacity-50 border-top border-light transition-all hover-bg-primary-subtle group">
+                <span class="small fw-medium text-white group-hover-text-primary transition-colors">View Details</span>
+                <i class="fas fa-arrow-right text-secondary group-hover-text-primary transition-all group-hover-translate-x"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="glass-panel p-0 h-100 position-relative overflow-hidden hover-lift transition-all" style="border: 1px solid rgba(16, 185, 129, 0.3);">
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.2), transparent 70%); pointer-events: none;"></div>
+            <div class="p-4 position-relative z-1">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h6 class="text-uppercase text-success fw-bold tracking-wider mb-1" style="font-size: 0.75rem;">Resolved</h6>
+                        <h2 class="fw-bold text-white mb-0 lh-1">@Model.ResolvedItems</h2>
+                    </div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.15);">
+                        <i class="fas fa-check-circle text-success fs-4"></i>
+                    </div>
+                </div>
+            </div>
+            <a asp-action="Items" asp-route-status="Resolved" class="text-decoration-none d-flex justify-content-between align-items-center px-4 py-3 bg-dark bg-opacity-50 border-top border-light transition-all hover-bg-success-subtle group">
+                <span class="small fw-medium text-white group-hover-text-success transition-colors">View Details</span>
+                <i class="fas fa-arrow-right text-secondary group-hover-text-success transition-all group-hover-translate-x"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="glass-panel p-0 h-100 position-relative overflow-hidden hover-lift transition-all" style="border: 1px solid rgba(139, 92, 246, 0.3);">
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.2), transparent 70%); pointer-events: none;"></div>
+            <div class="p-4 position-relative z-1">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h6 class="text-uppercase text-info fw-bold tracking-wider mb-1" style="font-size: 0.75rem; color: var(--accent-secondary) !important;">Total Users</h6>
+                        <h2 class="fw-bold text-white mb-0 lh-1">@Model.TotalUsers</h2>
+                    </div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: rgba(139, 92, 246, 0.15);">
+                        <i class="fas fa-users fs-4" style="color: var(--accent-secondary);"></i>
+                    </div>
+                </div>
+            </div>
+            <a asp-action="Users" class="text-decoration-none d-flex justify-content-between align-items-center px-4 py-3 bg-dark bg-opacity-50 border-top border-light transition-all hover-bg-info-subtle group">
+                <span class="small fw-medium text-white transition-colors" style="transition: color 0.2s;" onmouseover="this.style.color='var(--accent-secondary)'" onmouseout="this.style.color='white'">Manage Users</span>
+                <i class="fas fa-arrow-right text-secondary transition-all group-hover-translate-x" style="transition: color 0.2s;" onmouseover="this.style.color='var(--accent-secondary)'" onmouseout="this.style.color=''"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="glass-panel p-0 h-100 position-relative overflow-hidden hover-lift transition-all" style="border: 1px solid rgba(239, 68, 68, 0.3);">
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at top right, rgba(239, 68, 68, 0.2), transparent 70%); pointer-events: none;"></div>
+            <div class="p-4 position-relative z-1">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h6 class="text-uppercase text-danger fw-bold tracking-wider mb-1" style="font-size: 0.75rem;">Flagged</h6>
+                        <h2 class="fw-bold text-white mb-0 lh-1">@Model.FlaggedItemsCount</h2>
+                    </div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: rgba(239, 68, 68, 0.15);">
+                        <i class="fas fa-flag text-danger fs-4"></i>
+                    </div>
+                </div>
+            </div>
+            <a asp-action="Flags" class="text-decoration-none d-flex justify-content-between align-items-center px-4 py-3 bg-dark bg-opacity-50 border-top border-light transition-all hover-bg-danger-subtle group">
+                <span class="small fw-medium text-white group-hover-text-danger transition-colors">Review Flags</span>
+                <i class="fas fa-arrow-right text-secondary group-hover-text-danger transition-all group-hover-translate-x"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row animate-fade-in-up" style="animation-delay: 0.2s;">
     <div class="col-lg-8 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-bottom py-3">
-                <h5 class="card-title fw-bold mb-0">Posting Activity (Last 12 Months)</h5>
+        <div class="glass-panel h-100 p-0 overflow-hidden">
+            <div class="p-4 border-bottom border-light bg-dark bg-opacity-25 d-flex align-items-center">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px; background: rgba(59, 130, 246, 0.15);">
+                    <i class="fas fa-chart-line text-primary"></i>
+                </div>
+                <h5 class="fw-bold text-white mb-0" style="font-family: var(--font-heading);">Posting Activity <span class="text-secondary fw-normal fs-6">(Last 12 Months)</span></h5>
             </div>
-            <div class="card-body p-4">
+            <div class="p-4 bg-white rounded-bottom" style="opacity: 0.95;">
                 <canvas id="activityChart" height="100"></canvas>
             </div>
         </div>
     </div>
     
     <div class="col-lg-4 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-bottom py-3">
-                <h5 class="card-title fw-bold mb-0">Quick Actions</h5>
+        <div class="glass-panel h-100 p-0 overflow-hidden">
+            <div class="p-4 border-bottom border-light bg-dark bg-opacity-25 d-flex align-items-center">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px; background: rgba(245, 158, 11, 0.15);">
+                    <i class="fas fa-bolt text-warning"></i>
+                </div>
+                <h5 class="fw-bold text-white mb-0" style="font-family: var(--font-heading);">Quick Actions</h5>
             </div>
-            <div class="card-body">
+            <div class="p-4">
                 <div class="d-grid gap-3">
-                    <a asp-action="Categories" class="btn btn-outline-primary text-start p-3">
-                        <i class="fas fa-tags me-3 fs-5"></i> Manage Categories
+                    <a asp-action="Categories" class="btn btn-dark bg-opacity-50 border border-light text-white text-start p-3 d-flex align-items-center transition-all hover-bg-light-subtle group">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: rgba(59, 130, 246, 0.15);">
+                            <i class="fas fa-tags text-primary fs-5"></i>
+                        </div>
+                        <span class="fw-medium flex-grow-1">Manage Categories</span>
+                        <i class="fas fa-chevron-right text-secondary group-hover-translate-x transition-transform"></i>
                     </a>
-                    <a asp-action="Announcement" class="btn btn-outline-primary text-start p-3">
-                        <i class="fas fa-bullhorn me-3 fs-5"></i> Set Announcement
+                    <a asp-action="Announcement" class="btn btn-dark bg-opacity-50 border border-light text-white text-start p-3 d-flex align-items-center transition-all hover-bg-light-subtle group">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: rgba(245, 158, 11, 0.15);">
+                            <i class="fas fa-bullhorn text-warning fs-5"></i>
+                        </div>
+                        <span class="fw-medium flex-grow-1">Set Announcement</span>
+                        <i class="fas fa-chevron-right text-secondary group-hover-translate-x transition-transform"></i>
                     </a>
-                    <a href="/hangfire" target="_blank" class="btn btn-outline-primary text-start p-3">
-                        <i class="fas fa-cogs me-3 fs-5"></i> Background Jobs (Hangfire)
+                    <a href="/hangfire" target="_blank" class="btn btn-dark bg-opacity-50 border border-light text-white text-start p-3 d-flex align-items-center transition-all hover-bg-light-subtle group">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: rgba(139, 92, 246, 0.15);">
+                            <i class="fas fa-cogs fs-5" style="color: var(--accent-secondary);"></i>
+                        </div>
+                        <span class="fw-medium flex-grow-1">Background Jobs <span class="badge bg-secondary ms-2 small">New Tab</span></span>
+                        <i class="fas fa-external-link-alt text-secondary group-hover-translate-x transition-transform ms-2"></i>
                     </a>
-                    <a asp-action="Export" class="btn btn-outline-success text-start p-3">
-                        <i class="fas fa-file-csv me-3 fs-5"></i> Export Data (CSV)
+                    <a asp-action="Export" class="btn btn-dark bg-opacity-50 border border-light text-white text-start p-3 d-flex align-items-center transition-all hover-bg-light-subtle group">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: rgba(16, 185, 129, 0.15);">
+                            <i class="fas fa-file-csv text-success fs-5"></i>
+                        </div>
+                        <span class="fw-medium flex-grow-1">Export Data (CSV)</span>
+                        <i class="fas fa-download text-secondary group-hover-translate-y transition-transform"></i>
                     </a>
                 </div>
             </div>

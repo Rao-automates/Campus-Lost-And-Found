@@ -2,6 +2,7 @@
 @using WEBDEV_Project.Models
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject WEBDEV_Project.Data.ApplicationDbContext DbContext
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,71 +18,87 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
-                <i class="fas fa-search-location me-2"></i>Campus L&F
+    @{
+        var activeAnnouncement = DbContext.Announcements.FirstOrDefault(a => a.IsActive);
+    }
+    @if (activeAnnouncement != null)
+    {
+        <div class="alert alert-warning text-center rounded-0 mb-0 py-2 border-0 fw-bold" style="background-color: var(--accent-primary); color: white; z-index: 1040; position: relative;">
+            <i class="fas fa-bullhorn me-2"></i>
+            <span>@activeAnnouncement.Message</span>
+        </div>
+    }
+
+    <div class="container nav-floating mt-3">
+        <nav class="navbar navbar-expand-lg nav-pill">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));">
+                    <i class="fas fa-search-location text-white small"></i>
+                </div>
+                <span>Campus L&F</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars text-white"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav me-auto ps-lg-3">
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Items" asp-action="Index">Browse Items</a>
+                        <a class="nav-link px-3" asp-controller="Items" asp-action="Index"><i class="fas fa-compass me-1"></i> Browse</a>
                     </li>
                 </ul>
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav ms-auto align-items-center gap-2">
                     @if (SignInManager.IsSignedIn(User))
                     {
                         var user = await UserManager.GetUserAsync(User);
                         
-                        <li class="nav-item me-3">
-                            <a class="btn btn-warning btn-sm fw-bold rounded-pill shadow-sm px-3" asp-controller="Items" asp-action="Create">
-                                <i class="fas fa-plus-circle me-1"></i> Post Item
+                        <li class="nav-item">
+                            <a class="btn btn-primary btn-sm" asp-controller="Items" asp-action="Create">
+                                <i class="fas fa-plus me-1"></i> Post Item
                             </a>
                         </li>
                         
                         <!-- Notification Bell -->
-                        <li class="nav-item dropdown me-3">
+                        <li class="nav-item dropdown">
                             <a class="nav-link position-relative" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-bell fs-5"></i>
-                                <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                                <i class="fas fa-bell"></i>
+                                <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.6rem; padding: 0.25em 0.5em;">
                                     0
                                 </span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-end p-0 shadow-sm" style="width: 320px;" aria-labelledby="notifDropdown">
-                                <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0 fw-bold">Notifications</h6>
-                                    <a asp-controller="Notifications" asp-action="Index" class="small text-decoration-none">View All</a>
+                            <div class="dropdown-menu dropdown-menu-end border-0" style="width: 320px;" aria-labelledby="notifDropdown">
+                                <div class="p-3 border-bottom border-secondary d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0 fw-bold text-white">Notifications</h6>
+                                    <a asp-controller="Notifications" asp-action="Index" class="small text-decoration-none text-gradient">View All</a>
                                 </div>
                                 <div id="notifList" class="p-2 text-center text-muted small">Loading...</div>
                             </div>
                         </li>
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                                 @if(!string.IsNullOrEmpty(user?.AvatarPath))
                                 {
-                                    <img src="@user.AvatarPath" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;" />
+                                    <img src="@user.AvatarPath" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover; border: 2px solid var(--accent-primary);" />
                                 }
                                 else
                                 {
-                                    <i class="fas fa-user-circle fs-4 me-2"></i>
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-secondary" style="width: 28px; height: 28px;">
+                                        <i class="fas fa-user text-white small"></i>
+                                    </div>
                                 }
-                                <span>@user?.DisplayName</span>
+                                <span class="fw-semibold">@user?.DisplayName</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 mt-2">
+                                <li><a class="dropdown-item py-2" asp-controller="Profile" asp-action="Index"><i class="fas fa-user-circle me-2 text-secondary"></i> My Profile</a></li>
                                 @if (User.IsInRole("Admin"))
                                 {
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-danger" asp-controller="Admin" asp-action="Dashboard"><i class="fas fa-cog me-2"></i>Admin Dashboard</a></li>
+                                    <li><hr class="dropdown-divider border-secondary opacity-25"></li>
+                                    <li><a class="dropdown-item py-2 text-danger" asp-controller="Admin" asp-action="Dashboard"><i class="fas fa-shield-alt me-2"></i> Admin Panel</a></li>
                                 }
-                                <li><hr class="dropdown-divider"></li>
+                                <li><hr class="dropdown-divider border-secondary opacity-25"></li>
                                 <li>
                                     <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
-                                        <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                                        <button type="submit" class="dropdown-item py-2"><i class="fas fa-sign-out-alt me-2 text-secondary"></i> Logout</button>
                                     </form>
                                 </li>
                             </ul>
@@ -90,16 +107,16 @@
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                            <a class="nav-link fw-semibold" asp-controller="Account" asp-action="Login">Log in</a>
                         </li>
-                        <li class="nav-item ms-2">
-                            <a class="btn btn-light btn-sm fw-bold rounded-pill shadow-sm px-3" asp-controller="Account" asp-action="Register">Sign Up</a>
+                        <li class="nav-item">
+                            <a class="btn btn-primary btn-sm" asp-controller="Account" asp-action="Register">Sign up</a>
                         </li>
                     }
                 </ul>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </div>
 
     <div class="container mt-4 mb-5">
         <main role="main">
@@ -122,9 +139,10 @@
         </main>
     </div>
 
-    <footer class="bg-dark text-light py-4 mt-auto">
-        <div class="container text-center">
-            <p class="mb-0">&copy; @DateTime.Now.Year - Campus Lost & Found. Building a better community.</p>
+    <footer class="mt-auto border-top border-secondary border-opacity-25" style="background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(10px);">
+        <div class="container py-4 text-center">
+            <p class="mb-1 fw-medium text-secondary">&copy; @DateTime.Now.Year - Campus Lost & Found</p>
+            <p class="small text-muted mb-0">Building a better, connected community.</p>
         </div>
     </footer>
 
@@ -149,6 +167,32 @@
                 }
                 fetchNotifications();
                 setInterval(fetchNotifications, 60000); // Poll every minute
+
+                $('#notifDropdown').parent().on('show.bs.dropdown', function () {
+                    $('#notifList').html('<div class="p-3 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</div>');
+                    $.get('/Notifications/Dropdown', function(data) {
+                        if (data && data.length > 0) {
+                            var html = '<ul class="list-group list-group-flush bg-transparent">';
+                            data.forEach(function(n) {
+                                var bgClass = n.isRead ? 'bg-transparent' : 'bg-primary bg-opacity-10';
+                                var textClass = n.isRead ? 'text-light opacity-75' : 'text-white fw-bold';
+                                var link = n.link || '#';
+                                html += '<li class="list-group-item border-secondary ' + bgClass + '">' +
+                                            '<a href="' + link + '" class="text-decoration-none ' + textClass + ' d-block text-truncate" style="max-width: 100%;">' +
+                                                '<div class="small" style="white-space: normal;">' + n.message + '</div>' +
+                                                '<div class="text-white opacity-50 mt-1" style="font-size: 0.75rem;">' + n.createdAt + '</div>' +
+                                            '</a>' +
+                                        '</li>';
+                            });
+                            html += '</ul>';
+                            $('#notifList').html(html);
+                        } else {
+                            $('#notifList').html('<div class="p-3 text-center text-muted">No notifications yet.</div>');
+                        }
+                    }).fail(function() {
+                        $('#notifList').html('<div class="p-3 text-center text-danger">Error loading notifications.</div>');
+                    });
+                });
             });
         </script>
     }
